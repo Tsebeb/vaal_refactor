@@ -37,7 +37,8 @@ class Solver:
 
 
     def train(self, querry_dataloader, val_dataloader, task_model, vae, discriminator, unlabeled_dataloader):
-        self.args.train_iterations = (self.args.num_images * self.args.train_epochs) // self.args.batch_size
+        # self.args.train_iterations = (self.args.num_images * self.args.train_epochs) // self.args.batch_size
+        self.args.train_iterations = (len(querry_dataloader) * self.args.train_epochs)
         lr_change = self.args.train_iterations // 4
         labeled_data = self.read_data(querry_dataloader)
         unlabeled_data = self.read_data(unlabeled_dataloader, labels=False)
@@ -87,8 +88,8 @@ class Solver:
                 labeled_preds = discriminator(mu)
                 unlabeled_preds = discriminator(unlab_mu)
                 
-                lab_real_preds = torch.ones(labeled_imgs.size(0))
-                unlab_real_preds = torch.ones(unlabeled_imgs.size(0))
+                lab_real_preds = torch.ones_like(labeled_preds).detach()
+                unlab_real_preds = torch.ones_like(unlabeled_preds).detach()
                     
                 if self.args.cuda:
                     lab_real_preds = lab_real_preds.cuda()
@@ -120,8 +121,8 @@ class Solver:
                 labeled_preds = discriminator(mu)
                 unlabeled_preds = discriminator(unlab_mu)
                 
-                lab_real_preds = torch.ones(labeled_imgs.size(0))
-                unlab_fake_preds = torch.zeros(unlabeled_imgs.size(0))
+                lab_real_preds = torch.ones_like(labeled_preds).detach()
+                unlab_fake_preds = torch.zeros_like(unlabeled_preds).detach()
 
                 if self.args.cuda:
                     lab_real_preds = lab_real_preds.cuda()
@@ -152,20 +153,20 @@ class Solver:
                 print('Current vae model loss: {:.4f}'.format(total_vae_loss.item()))
                 print('Current discriminator model loss: {:.4f}'.format(dsc_loss.item()))
 
-            if iter_count % 1000 == 0:
-                acc = self.validate(task_model, val_dataloader)
-                if acc > best_acc:
-                    best_acc = acc
-                    best_model = copy.deepcopy(task_model)
-                
-                print('current step: {} acc: {}'.format(iter_count, acc))
-                print('best acc: ', best_acc)
+            # if iter_count % 1000 == 0:
+            #     acc = self.validate(task_model, val_dataloader)
+            #     if acc > best_acc:
+            #         best_acc = acc
+            #         best_model = copy.deepcopy(task_model)
+            #
+            #     print('current step: {} acc: {}'.format(iter_count, acc))
+            #     print('best acc: ', best_acc)
 
 
-        if self.args.cuda:
-            best_model = best_model.cuda()
+        # if self.args.cuda:
+        #     best_model = best_model.cuda()
 
-        final_accuracy = self.test(best_model)
+        final_accuracy = self.test(task_model)
         return final_accuracy, vae, discriminator
 
 

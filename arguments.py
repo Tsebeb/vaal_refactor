@@ -4,7 +4,7 @@ import os
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cuda', action='store_true', help='If training is to be done on a GPU')
-    parser.add_argument('--dataset', type=str, default='cifar10', help='Name of the dataset used.')
+    parser.add_argument('--dataset', type=str, default='cifar100', help='Name of the dataset used.')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size used for training and testing')
     parser.add_argument('--train_epochs', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--latent_dim', type=int, default=32, help='The dimensionality of the VAE latent dimension')

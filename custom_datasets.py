@@ -16,10 +16,12 @@ def imagenet_transformer():
 
 def cifar10_transformer():
     return torchvision.transforms.Compose([
-           torchvision.transforms.RandomHorizontalFlip(),
            torchvision.transforms.ToTensor(),
-           transforms.Normalize(mean=[0.5, 0.5, 0.5,],
-                                std=[0.5, 0.5, 0.5]),
+           torchvision.transforms.Pad(4),
+           torchvision.transforms.RandomCrop(32),
+           torchvision.transforms.RandomHorizontalFlip(p=0.5),
+           transforms.Normalize(mean=[0.5071, 0.4867, 0.4408,],
+                                std=[0.2675, 0.2565, 0.2761]),
        ])
 
 class CIFAR10(Dataset):
