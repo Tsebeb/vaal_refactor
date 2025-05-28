@@ -51,7 +51,7 @@ class VAE(nn.Module):
             nn.ReLU(True),
             nn.ConvTranspose2d(128, nc, 1),                       # B,   nc, 64, 64
         )
-        self.weight_init()
+        # self.weight_init()
 
     def weight_init(self):
         for block in self._modules:
@@ -97,7 +97,7 @@ class Discriminator(nn.Module):
             nn.Linear(512, 1),
             nn.Sigmoid()
         )
-        self.weight_init()
+        # self.weight_init()
 
     def weight_init(self):
         for block in self._modules:
