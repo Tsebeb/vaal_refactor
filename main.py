@@ -81,7 +81,7 @@ def main(args):
     val_indices = []
     all_indices = np.setdiff1d(list(all_indices), val_indices)
 
-    seed_everything(42)
+    seed_everything(args.seed)
     initial_indices = np.random.choice(all_indices, args.initial_budget, replace=False)
     sampler = data.sampler.SubsetRandomSampler(initial_indices)
     val_sampler = data.sampler.SubsetRandomSampler(val_indices)
@@ -102,8 +102,9 @@ def main(args):
     # need to retrain all the models on the new images
     # re initialize and retrain the models
     # task_model = vgg.vgg16_bn(num_classes=args.num_classes)
-    seed_everything(42)
+    seed_everything(args.seed)
     task_model = ResNet18CIFAR(num_classes=args.num_classes)
+    seed_everything(args.seed)
     vae = model.VAE(args.latent_dim)
     discriminator = model.Discriminator(args.latent_dim)
 
@@ -112,7 +113,8 @@ def main(args):
     state_dicts['discriminator'] = discriminator.state_dict()
     state_dicts['task_model'] = task_model.state_dict()
 
-    seed_everything(42)
+    seed_everything(args.seed)
+    set_indices = set()
     accuracies = []
     for i, split in enumerate(splits):
         task_model.load_state_dict(state_dicts['task_model'])
@@ -143,6 +145,7 @@ def main(args):
 
         sampled_indices = solver.sample_for_labeling(vae, discriminator, unlabeled_dataloader)
         current_indices = list(current_indices) + list(sampled_indices)
+
         sampler = data.sampler.SubsetRandomSampler(current_indices)
         querry_dataloader = data.DataLoader(train_dataset, sampler=sampler, 
                 batch_size=args.batch_size, drop_last=True)
